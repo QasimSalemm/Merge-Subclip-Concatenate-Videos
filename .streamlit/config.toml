@@ -1,9 +1,9 @@
 [server]
-maxUploadSize = 2048
+maxUploadSize = 512
 
 [theme]
-primaryColor = "#e2b79f"
-backgroundColor = "#fbfbfc"
-secondaryBackgroundColor = "#e2c0af"
-textColor = "#cf5628"
+primaryColor = "#727a7d"
+backgroundColor = "#f8f9f7"
+secondaryBackgroundColor = "#ed5324"
+textColor = "#1f1920"
 font = "sans serif"
