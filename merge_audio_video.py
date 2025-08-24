@@ -1,5 +1,5 @@
 import streamlit as st
-from moviepy import VideoFileClip, AudioFileClip, concatenate_videoclips
+from moviepy import VideoFileClip, AudioFileClip, concatenate_videoclips,CompositeAudioClip
 from datetime import datetime
 import tempfile, os
 from random import randint
@@ -68,7 +68,7 @@ def generate_key(prefix):
 # ==============================
 # Tabs
 # ==============================
-tab1, tab2, tab3 = st.tabs(["🎵 Merge Audio + Video", "✂️ Create Subclip", "🔗 Concatenate Videos"])
+tab1, tab2, tab3,tab4 = st.tabs(["🎵 Merge Audio + Video", "✂️ Create Subclip", "🔗 Concatenate Videos","🎶 Add Background Music"])
 
 # ==============================
 # 1️⃣ Merge Audio + Video
@@ -210,4 +210,70 @@ with tab3:
             st.session_state.concat_clips = []
             st.session_state.concat_temp_files = []
             st.session_state.concat_key = generate_key("concat")
+            st.rerun()
+# ==============================
+#4️⃣ Add Background Music (Keep Original + Music)
+# ==============================
+with tab4:
+    if "video_background_temp" not in st.session_state: st.session_state.video_background_temp = None
+    if "audio_background_temp" not in st.session_state: st.session_state.audio_background_temp = None
+    if "video_background_key" not in st.session_state: st.session_state.video_background_key = generate_key("video_background")
+    if "audio_background_key" not in st.session_state: st.session_state.audio_background_key = generate_key("audio_background")
+
+    merge_video_file = st.file_uploader("Upload Video", type=["mp4","mov","avi"], key=st.session_state.video_background_key)
+    merge_audio_file = st.file_uploader("Upload Audio", type=["mp3","wav"], key=st.session_state.audio_background_key)
+
+    if merge_video_file and merge_audio_file:
+        st.session_state.video_temp = save_temp_file(merge_video_file, ".mp4")
+        st.session_state.audio_temp = save_temp_file(merge_audio_file, ".mp3")
+
+        video = VideoFileClip(st.session_state.video_temp)
+        audio = AudioFileClip(st.session_state.audio_temp)
+
+        col1, col2 = st.columns(2)
+        col1.success(f"🎥 Video: {merge_video_file.name} | ⏱ {video.duration:.2f}s")
+        col2.success(f"🎵 Audio: {merge_audio_file.name} | ⏱ {audio.duration:.2f}s")
+
+        # ==============================
+        # Volume Adjustment (Main Panel)
+        # ==============================
+        st.subheader("🎚 Volume Adjustment")
+        original_volume = st.slider("🎙 Original Voice Volume", 0.0, 1.0, 1.0)
+        music_volume = st.slider("🎵 Background Music Volume", 0.0, 1.0, 0.5)
+
+        if st.button("▶️ Merge Now"):
+            # Adjust volumes
+            video_audio = video.audio.with_volume_scaled(original_volume) if video.audio else None
+            cut_music = audio.subclipped(0, min(audio.duration, video.duration)).with_volume_scaled(music_volume)
+
+            # Combine audios
+            if video_audio:
+                final_audio = CompositeAudioClip([video_audio, cut_music])
+            else:
+                final_audio = cut_music
+
+            output_video = video.with_audio(final_audio)
+
+            # Save final video
+            total_frames = int(output_video.fps * output_video.duration)
+            logger = StreamlitLogger(total_frames)
+            output_filename = f"Merged__{datetime.now().strftime('%H%M%S')}.mp4"
+
+            output_video.write_videofile(output_filename, codec=codec, audio_codec=audio_codec, logger=logger)
+
+            st.success("✅ Merge Completed!")
+            st.video(output_filename)
+
+            with open(output_filename, "rb") as f:
+                st.download_button("⬇️ Download Merged Video", f, file_name=output_filename)
+
+            close_and_remove(output_video, video, audio)
+
+        if st.button("❌ Remove Uploaded Files"):
+            close_and_remove(video, audio)
+            remove_temp_files(st.session_state.video_temp, st.session_state.audio_temp)
+            st.session_state.video_background_temp = None
+            st.session_state.audio_background_temp = None
+            st.session_state.video_background_key = generate_key("video_background")
+            st.session_state.audio_background_key = generate_key("audio_background")
             st.rerun()
