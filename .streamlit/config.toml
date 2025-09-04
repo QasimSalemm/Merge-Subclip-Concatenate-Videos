@@ -2,8 +2,9 @@
 maxUploadSize = 512
 
 [theme]
-primaryColor = "#727a7d"
-backgroundColor = "#f8f9f7"
-secondaryBackgroundColor = "#ed5324"
-textColor = "#1f1920"
-font = "sans serif"
+base="dark"
+borderColor="mediumSlateBlue"
+showWidgetBorder=false
+
+[theme.sidebar]
+showWidgetBorder=true

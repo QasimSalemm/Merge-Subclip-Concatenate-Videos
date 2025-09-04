@@ -277,3 +277,4 @@ with tab4:
             st.session_state.video_background_key = generate_key("video_background")
             st.session_state.audio_background_key = generate_key("audio_background")
             st.rerun()
+
