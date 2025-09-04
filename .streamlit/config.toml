@@ -1,6 +1,5 @@
 [server]
 maxUploadSize = 512
-
 [theme]
 base="dark"
 borderColor="mediumSlateBlue"
