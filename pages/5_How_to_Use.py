@@ -78,12 +78,11 @@ st.write(
     "To start fresh, use the 'Clear All' button to remove uploaded files and reset the editor. "
     "This ensures a clean workspace for your next project."
 )
-
 # Footer
 st.write("---")
-st.success(
-    "💡 Use high-quality video and audio files for the best editing output.\n"
-    "💡 Keep video durations reasonable to avoid long processing times.\n"
-    "💡 Ensure audio length matches or is longer than video when adding background music.\n"
-    "💡 Avoid unsupported file formats to prevent errors."
-)
+st.success("""**Tips:**\n
+                ✔ Use high-quality video and audio files for the best editing output.\n
+                ✔ Keep video durations reasonable to avoid long processing times.\n
+                ✔ Ensure audio length matches or is longer than video when adding background music.\n
+                ✔ Avoid unsupported file formats to prevent errors.
+            """)
